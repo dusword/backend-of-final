@@ -14,7 +14,7 @@ public class PredictController {
     @Autowired
     PredictService predictService;
 
-    @PostMapping("/predictPic")
+    @PostMapping("/onePic")
     public JSONObject predictPic(@RequestParam("file")MultipartFile multipartFile){
         return predictService.predictPic(multipartFile);
     }
