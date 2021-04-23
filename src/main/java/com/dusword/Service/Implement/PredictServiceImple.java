@@ -1,5 +1,6 @@
 package com.dusword.Service.Implement;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dusword.Service.PredictService;
 import okhttp3.*;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @Service
 public class PredictServiceImple implements PredictService {
     @Override
-    public JSONObject predictPic(MultipartFile multipartFile) {
+    public String predictPic(MultipartFile multipartFile) {
         String tmpFileDir = null;
         String fileName = null;
         File dirFile = null;
@@ -33,25 +34,31 @@ public class PredictServiceImple implements PredictService {
             fileName = tmpFileDir + "/" + multipartFile.getOriginalFilename();
             localFile = new File(fileName);
             multipartFile.transferTo(localFile);
-
-            OkHttpClient client = new OkHttpClient().newBuilder()
-                    .build();
-            MultipartBody.Builder requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
-            RequestBody body = RequestBody.create(MediaType.parse("multipart-formdata"), localFile);
-            String picName = localFile.getName();
-            System.out.println("filename is:");
-            System.out.println(picName);
-            // 参数分别为， 请求key ，文件名称 ， RequestBody
-            requestBody.addFormDataPart("file", picName, body);
-            String url = "http://0.0.0.0:5000/upload_image";
-            Request request = new Request.Builder().url(url).post(requestBody.build()).build();
-            try {
-                Response response = client.newCall(request).execute();
-                System.out.println(response);
-            } catch (IOException e) {
-                e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        MultipartBody.Builder requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
+        RequestBody body = RequestBody.create(MediaType.parse("multipart-formdata"), localFile);
+        String picName = localFile.getName();
+        System.out.println("filename is:");
+        System.out.println(picName);
+        // 参数分别为， 请求key ，文件名称 ， RequestBody
+        requestBody.addFormDataPart("file", picName, body);
+        String url = "http://0.0.0.0:5000/upload_image";
+        Request request = new Request.Builder().url(url).post(requestBody.build()).build();
+        try {
+            Response response = client.newCall(request).execute();
+            System.out.println(response);
+            String jsonString = null;
+            if (response.body() != null) {
+                jsonString = response.body().string();
             }
-            return null;
+            JSONObject jsonObject = JSON.parseObject(jsonString);
+            String base64_result = jsonObject.getString("base64_result");
+            System.out.println(base64_result);
+            return base64_result;
         } catch (IOException e) {
             e.printStackTrace();
         }
