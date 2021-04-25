@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -40,7 +41,7 @@ public class PredictServiceImple implements PredictService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        OkHttpClient client = new OkHttpClient().newBuilder()
+        OkHttpClient client = new OkHttpClient().newBuilder().connectTimeout(60000, TimeUnit.MILLISECONDS).readTimeout(60000,TimeUnit.MILLISECONDS)
                 .build();
         MultipartBody.Builder requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
         RequestBody body = RequestBody.create(MediaType.parse("multipart-formdata"), localFile);
