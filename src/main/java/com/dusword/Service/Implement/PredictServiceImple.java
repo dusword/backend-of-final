@@ -59,8 +59,8 @@ public class PredictServiceImple implements PredictService {
                 jsonString = response.body().string();
             }
             JSONObject jsonObject = JSON.parseObject(jsonString);
-//            String base64_result = jsonObject.getString("base64_result");
-//            System.out.println(base64_result);
+            String result_image_path = jsonObject.getString("result_image_path");
+            System.out.println(result_image_path);
             System.out.println("PredictService end!");
             System.out.println("start to delete tmp file!");
             deleteDir(dirFile);
