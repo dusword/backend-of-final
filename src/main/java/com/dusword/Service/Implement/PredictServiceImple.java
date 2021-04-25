@@ -14,10 +14,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+
 @Service
 public class PredictServiceImple implements PredictService {
     @Override
-    public String predictPic(MultipartFile multipartFile) {
+    public JSONObject predictPic(MultipartFile multipartFile) {
+        System.out.println("PredictService start!");
         String tmpFileDir = null;
         String fileName = null;
         File dirFile = null;
@@ -27,6 +29,7 @@ public class PredictServiceImple implements PredictService {
             String randomFileName = UUID.randomUUID().toString();
             tmpFileDir = "D:/tmp/tmpFile/" + randomFileName;
             dirFile = new File(tmpFileDir);
+            System.out.println(dirFile.getPath());
             if (!dirFile.exists()) {
                 dirFile.mkdirs();
             }
@@ -56,12 +59,32 @@ public class PredictServiceImple implements PredictService {
                 jsonString = response.body().string();
             }
             JSONObject jsonObject = JSON.parseObject(jsonString);
-            String base64_result = jsonObject.getString("base64_result");
-            System.out.println(base64_result);
-            return base64_result;
+//            String base64_result = jsonObject.getString("base64_result");
+//            System.out.println(base64_result);
+            System.out.println("PredictService end!");
+            System.out.println("start to delete tmp file!");
+            deleteDir(dirFile);
+            return jsonObject;
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
     }
+    /*
+    递归删除tmp文件的方法
+     */
+    public static void deleteDir(File file){
+        //判断是否为文件夹
+        if(file.isDirectory()){
+            //获取该文件夹下的子文件夹
+            File[] files = file.listFiles();
+            //循环子文件夹重复调用delete方法
+            for (File value : files) {
+                deleteDir(value);
+            }
+        }
+        //若为空文件夹或者文件删除，File类的删除方法
+        file.delete();
+    }
+
 }
