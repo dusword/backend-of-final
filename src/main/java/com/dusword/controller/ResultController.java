@@ -16,7 +16,7 @@ import java.util.Optional;
 public class ResultController {
     @Autowired
     private ResultRepository resultRepository;
-    private Result result;
+
     @Autowired
     private ResultMapper resultMapper;
     @Autowired

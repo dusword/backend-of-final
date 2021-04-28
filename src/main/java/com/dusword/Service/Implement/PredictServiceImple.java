@@ -2,25 +2,31 @@ package com.dusword.Service.Implement;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.dusword.Mapper.PredictedFileMapper;
 import com.dusword.Service.PredictService;
+import com.dusword.entity.PredictedFile;
 import okhttp3.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
 @Service
 public class PredictServiceImple implements PredictService {
+
+    @Autowired
+    private PredictedFileMapper predictedFileMapper;
+
     @Override
     public JSONObject predictPic(MultipartFile multipartFile) {
         System.out.println("PredictService start!");
+        //文件处理部分
         String tmpFileDir = null;
         String fileName = null;
         File dirFile = null;
@@ -41,6 +47,7 @@ public class PredictServiceImple implements PredictService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //请求部分
         OkHttpClient client = new OkHttpClient().newBuilder().connectTimeout(60000, TimeUnit.MILLISECONDS).readTimeout(60000,TimeUnit.MILLISECONDS)
                 .build();
         MultipartBody.Builder requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
@@ -60,8 +67,25 @@ public class PredictServiceImple implements PredictService {
                 jsonString = response.body().string();
             }
             JSONObject jsonObject = JSON.parseObject(jsonString);
-            String result_image_path = jsonObject.getString("result_image_path");
-            System.out.println(result_image_path);
+            String base64Result = jsonObject.getString("base64_result");
+            Integer finalResult =jsonObject.getInteger("final_result");
+            String divisionResult = null;
+            if (finalResult==0){
+                divisionResult = "阳性";
+            }else
+                divisionResult="阴性";
+            Date date=new Date();
+            //格式化时间
+            SimpleDateFormat sim=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String time=sim.format(date);
+            System.out.println(time);
+            PredictedFile predictedFile=new PredictedFile();
+            predictedFile.setRecordTime(time);
+            predictedFile.setBase64Result(base64Result);
+            predictedFile.setDivisionResult(divisionResult);
+            predictedFile.setFileName(picName);
+            int isInsertSuccess = predictedFileMapper.insert(predictedFile);
+            System.out.println("is Insert Success?"+isInsertSuccess);
             System.out.println("PredictService end!");
             System.out.println("start to delete tmp file!");
             deleteDir(dirFile);
