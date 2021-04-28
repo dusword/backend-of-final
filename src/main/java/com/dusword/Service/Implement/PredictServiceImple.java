@@ -24,7 +24,7 @@ public class PredictServiceImple implements PredictService {
     private PredictedFileMapper predictedFileMapper;
 
     @Override
-    public JSONObject predictPic(MultipartFile multipartFile) {
+    public JSONObject predictPic(MultipartFile multipartFile, Integer userId) {
         System.out.println("PredictService start!");
         //文件处理部分
         String tmpFileDir = null;
@@ -51,12 +51,12 @@ public class PredictServiceImple implements PredictService {
         OkHttpClient client = new OkHttpClient().newBuilder().connectTimeout(60000, TimeUnit.MILLISECONDS).readTimeout(60000,TimeUnit.MILLISECONDS)
                 .build();
         MultipartBody.Builder requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
-        RequestBody body = RequestBody.create(MediaType.parse("multipart-formdata"), localFile);
+        RequestBody body1 = RequestBody.create(MediaType.parse("multipart-formdata"), localFile);
         String picName = localFile.getName();
         System.out.println("filename is:");
         System.out.println(picName);
         // 参数分别为， 请求key ，文件名称 ， RequestBody
-        requestBody.addFormDataPart("file", picName, body);
+        requestBody.addFormDataPart("file", picName, body1).addFormDataPart("userId",userId.toString());
         String url = "http://0.0.0.0:5000/upload_image";
         Request request = new Request.Builder().url(url).post(requestBody.build()).build();
         try {
@@ -81,6 +81,7 @@ public class PredictServiceImple implements PredictService {
             System.out.println(time);
             PredictedFile predictedFile=new PredictedFile();
             predictedFile.setRecordTime(time);
+            predictedFile.setUserId(userId);
             predictedFile.setBase64Result(base64Result);
             predictedFile.setDivisionResult(divisionResult);
             predictedFile.setFileName(picName);
