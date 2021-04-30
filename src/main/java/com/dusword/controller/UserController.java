@@ -37,6 +37,7 @@ public class UserController {
 
     @PostMapping("/insertUser")
     public Integer insertUser(@RequestBody User user){
+        System.out.println("insert User");
         return userMapper.insert(user);
     }
 
@@ -44,8 +45,7 @@ public class UserController {
     public Integer checkUser(@RequestBody User user) {
         QueryWrapper<User> wrapper=new QueryWrapper<>();
         wrapper.eq("user_name",user.getUserName()).eq("user_password",user.getUserPassword());
-        User targetUser = userMapper.selectOne(wrapper);
-        if (targetUser !=null) {
+        if (userMapper.selectList(wrapper).size() !=0) {
             return 1;
         } else return 0;
     }
