@@ -6,7 +6,7 @@ spring:
     password: lxj19990716
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
-      max-lifetime: 1200000
+      max-lifetime: 50000
       connection-timeout: 60000
       validation-timeout: 3000
       idle-timeout: 30000

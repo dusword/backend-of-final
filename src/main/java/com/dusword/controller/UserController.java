@@ -38,16 +38,30 @@ public class UserController {
     @PostMapping("/insertUser")
     public Integer insertUser(@RequestBody User user){
         System.out.println("insert User");
-        return userMapper.insert(user);
+        QueryWrapper<User> wrapper=new QueryWrapper<>();
+        wrapper.eq("user_name",user.getUserName());
+        if (userMapper.selectList(wrapper).size() !=0) {
+            return 0;
+        } else{
+            userMapper.insert(user);
+            return 1;
+        }
     }
 
     @PostMapping("/checkUser")
     public Integer checkUser(@RequestBody User user) {
         QueryWrapper<User> wrapper=new QueryWrapper<>();
         wrapper.eq("user_name",user.getUserName()).eq("user_password",user.getUserPassword());
-        if (userMapper.selectList(wrapper).size() !=0) {
-            return 1;
-        } else return 0;
+        try {
+            user=userMapper.selectOne(wrapper);
+            if (user == null){
+                return 0;
+            }
+            return user.getUserId();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     @GetMapping("/selectAllUser")
