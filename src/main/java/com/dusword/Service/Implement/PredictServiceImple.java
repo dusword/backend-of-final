@@ -26,6 +26,9 @@ public class PredictServiceImple implements PredictService {
     @Override
     public JSONObject predictPic(MultipartFile multipartFile, Integer userId) {
         System.out.println("PredictService start!");
+        if (userId == null){
+            userId =0;
+        }
         //文件处理部分
         String tmpFileDir = null;
         String fileName = null;
