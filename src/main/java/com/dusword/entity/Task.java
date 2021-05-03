@@ -16,6 +16,7 @@ public class Task {
     private String FileName;
     private Integer IsPredicted;
     private Integer PredictedFileId;
+    private String FilePath;
 
     public Integer getId() {
         return Id;
@@ -63,5 +64,13 @@ public class Task {
 
     public void setPredictedFileId(Integer predictedFileId) {
         PredictedFileId = predictedFileId;
+    }
+
+    public String getFilePath() {
+        return FilePath;
+    }
+
+    public void setFilePath(String filePath) {
+        FilePath = filePath;
     }
 }

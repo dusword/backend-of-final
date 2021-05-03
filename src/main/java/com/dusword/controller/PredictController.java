@@ -30,6 +30,11 @@ public class PredictController {
         return predictService.saveMultiPic(multipartFile,userId);
     }
 
+    @PostMapping("/doTask")
+    public JSONObject doTask(){
+        return predictService.predictTaskPic();
+    }
+
     @GetMapping("/selectAll")
     public List<PredictedFile> selectAllFromPredictedFile(){
         return predictedFileMapper.selectList(null);

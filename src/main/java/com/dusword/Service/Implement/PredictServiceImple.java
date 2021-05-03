@@ -2,6 +2,7 @@ package com.dusword.Service.Implement;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dusword.Mapper.PredictedFileMapper;
 import com.dusword.Mapper.TaskMapper;
 import com.dusword.Service.PredictService;
@@ -35,6 +36,79 @@ public class PredictServiceImple implements PredictService {
             userId = 0;
         }
         //文件处理部分
+        File localFile = makeDir(multipartFile);
+        //请求部分
+        return httpRequest(localFile, userId);
+    }
+
+    @Override
+    public String saveMultiPic(MultipartFile multipartFile, Integer userId) {
+        System.out.println("PredictService start!");
+        if (userId == null) {
+            userId = 0;
+        }
+        //文件处理部分
+        File localFile = makeDir(multipartFile);
+        Task task = new Task();
+        task.setFileName(localFile.getName());
+        task.setUserId(userId);
+        task.setFilePath(localFile.getAbsolutePath());
+        //格式化时间
+        Date date = new Date();
+        SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String time = sim.format(date);
+        System.out.println(time);
+        task.setCreatedTime(time);
+        int isInsertSuccess = taskMapper.insert(task);
+        System.out.println("is Insert Success?" + isInsertSuccess);
+        if (isInsertSuccess == 1) {
+            return "OK";
+        }
+        return "Failed!";
+    }
+
+    @Override
+    public JSONObject predictTaskPic() {
+        System.out.println("Start task predict");
+        QueryWrapper<Task> wrapper = new QueryWrapper<>();
+        wrapper.eq("is_predicted", 0).orderByAsc("id").last("limit 1");
+        Task task = taskMapper.selectOne(wrapper);
+        if (task != null) {
+            System.out.println("Task id is:" + task.getId());
+            File file = new File(task.getFilePath());
+            task.setIsPredicted(1);
+            JSONObject jsonObject = httpRequest(file, task.getUserId());
+            Integer predictedFileId = jsonObject.getInteger("predicted_file_id");
+            task.setPredictedFileId(predictedFileId);
+            taskMapper.updateById(task);
+            return jsonObject;
+        } else return null;
+    }
+
+    /*
+    递归删除tmp文件的方法
+     */
+    public static void deleteDir(File file) {
+        //判断是否为文件夹
+        if (file.isDirectory()) {
+            //获取该文件夹下的子文件夹
+            File[] files = file.listFiles();
+            //循环子文件夹重复调用delete方法
+            for (File value : files) {
+                deleteDir(value);
+            }
+        }
+        //若为空文件夹或者文件删除，File类的删除方法
+        file.delete();
+    }
+
+    /**
+     * 创建本地文件工具方法
+     *
+     * @param multipartFile
+     * @return
+     */
+    public static File makeDir(MultipartFile multipartFile) {
         String tmpFileDir = null;
         String fileName = null;
         File dirFile = null;
@@ -56,7 +130,10 @@ public class PredictServiceImple implements PredictService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //请求部分
+        return localFile;
+    }
+
+    public JSONObject httpRequest(File localFile, Integer userId) {
         OkHttpClient client = new OkHttpClient().newBuilder().connectTimeout(60000, TimeUnit.MILLISECONDS).readTimeout(60000, TimeUnit.MILLISECONDS)
                 .build();
         MultipartBody.Builder requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
@@ -95,77 +172,16 @@ public class PredictServiceImple implements PredictService {
             predictedFile.setDivisionResult(divisionResult);
             predictedFile.setFileName(picName);
             int isInsertSuccess = predictedFileMapper.insert(predictedFile);
+            jsonObject.put("predicted_file_id", predictedFile.getId());
             System.out.println("is Insert Success?" + isInsertSuccess);
             System.out.println("PredictService end!");
             System.out.println("start to delete tmp file!");
-            deleteDir(dirFile);
+            deleteDir(localFile);
             return jsonObject;
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    @Override
-    public String saveMultiPic(MultipartFile multipartFile, Integer userId) {
-        System.out.println("PredictService start!");
-        if (userId == null) {
-            userId = 0;
-        }
-        //文件处理部分
-        String tmpFileDir = null;
-        String fileName = null;
-        File dirFile = null;
-        File localFile = null;
-        try {
-            //制作每个文件特有的目录，保证并发或重名时不出问题
-            String randomFileName = UUID.randomUUID().toString();
-            tmpFileDir = "D:/tmp/tmpFile/" + randomFileName;
-            dirFile = new File(tmpFileDir);
-            System.out.println(dirFile.getPath());
-            if (!dirFile.exists()) {
-                dirFile.mkdirs();
-            }
-            //MultipartFile转成File对象
-            fileName = tmpFileDir + "/" + multipartFile.getOriginalFilename();
-            localFile = new File(fileName);
-            multipartFile.transferTo(localFile);
-            System.out.println(localFile.getAbsolutePath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Task task = new Task();
-        task.setFileName(localFile.getName());
-        task.setUserId(userId);
-        //格式化时间
-        Date date = new Date();
-        SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String time = sim.format(date);
-        System.out.println(time);
-        task.setCreatedTime(time);
-        int isInsertSuccess = taskMapper.insert(task);
-        System.out.println("is Insert Success?" + isInsertSuccess);
-        if (isInsertSuccess == 1) {
-            return "OK";
-        }
-        return "Failed!";
-    }
-
-    /*
-    递归删除tmp文件的方法
-     */
-    public static void deleteDir(File file) {
-        //判断是否为文件夹
-        if (file.isDirectory()) {
-            //获取该文件夹下的子文件夹
-            File[] files = file.listFiles();
-            //循环子文件夹重复调用delete方法
-            for (File value : files) {
-                deleteDir(value);
-            }
-        }
-        //若为空文件夹或者文件删除，File类的删除方法
-        file.delete();
     }
 
 }
