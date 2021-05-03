@@ -21,8 +21,13 @@ public class PredictController {
     PredictedFileMapper predictedFileMapper;
 
     @PostMapping("/onePic")
-    public JSONObject predictPic(@RequestParam("file")MultipartFile multipartFile,@RequestParam("userId")Integer userId){
+    public JSONObject predictOnePic(@RequestParam("file")MultipartFile multipartFile,@RequestParam("userId")Integer userId){
         return predictService.predictPic(multipartFile,userId);
+    }
+
+    @PostMapping("/multiPic")
+    public String predictMultiPic(@RequestParam("file")MultipartFile multipartFile,@RequestParam("userId")Integer userId){
+        return predictService.saveMultiPic(multipartFile,userId);
     }
 
     @GetMapping("/selectAll")

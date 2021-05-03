@@ -5,4 +5,5 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface PredictService {
     JSONObject predictPic(MultipartFile multipartFile, Integer userId);
+    String saveMultiPic(MultipartFile multipartFile, Integer userId);
 }
