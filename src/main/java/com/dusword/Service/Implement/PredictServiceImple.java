@@ -38,11 +38,13 @@ public class PredictServiceImple implements PredictService {
         //文件处理部分
         File localFile = makeDir(multipartFile);
         //请求部分
-        return httpRequest(localFile, userId);
+        JSONObject jsonObject = httpRequest(localFile, userId);
+        deleteDir(localFile);
+        return jsonObject;
     }
 
     @Override
-    public String saveMultiPic(MultipartFile multipartFile, Integer userId) {
+    public String saveMultiPic(MultipartFile multipartFile, Integer userId,String message) {
         System.out.println("PredictService start!");
         if (userId == null) {
             userId = 0;
@@ -52,6 +54,7 @@ public class PredictServiceImple implements PredictService {
         Task task = new Task();
         task.setFileName(localFile.getName());
         task.setUserId(userId);
+        task.setMessage(message);
         task.setFilePath(localFile.getAbsolutePath());
         //格式化时间
         Date date = new Date();
@@ -71,18 +74,21 @@ public class PredictServiceImple implements PredictService {
     public JSONObject predictTaskPic() {
         System.out.println("Start task predict");
         QueryWrapper<Task> wrapper = new QueryWrapper<>();
-        wrapper.eq("is_predicted", 0).orderByAsc("id").last("limit 1");
+        wrapper.eq("is_predicted", "未完成").orderByAsc("id").last("limit 1");
         Task task = taskMapper.selectOne(wrapper);
         if (task != null) {
             System.out.println("Task id is:" + task.getId());
             File file = new File(task.getFilePath());
-            task.setIsPredicted(1);
             JSONObject jsonObject = httpRequest(file, task.getUserId());
-            Integer predictedFileId = jsonObject.getInteger("predicted_file_id");
-            task.setPredictedFileId(predictedFileId);
-            taskMapper.updateById(task);
-            return jsonObject;
-        } else return null;
+            if (jsonObject != null) {
+                Integer predictedFileId = jsonObject.getInteger("predicted_file_id");
+                task.setIsPredicted("已完成");
+                task.setPredictedFileId(predictedFileId);
+                taskMapper.updateById(task);
+                deleteDir(file);
+                return jsonObject;
+            }return null;
+        } return null;
     }
 
     /*
@@ -176,7 +182,6 @@ public class PredictServiceImple implements PredictService {
             System.out.println("is Insert Success?" + isInsertSuccess);
             System.out.println("PredictService end!");
             System.out.println("start to delete tmp file!");
-            deleteDir(localFile);
             return jsonObject;
         } catch (IOException e) {
             e.printStackTrace();

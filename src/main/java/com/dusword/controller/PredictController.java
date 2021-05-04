@@ -1,6 +1,8 @@
 package com.dusword.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dusword.Mapper.PredictedFileMapper;
 import com.dusword.Service.PredictService;
 import com.dusword.entity.PredictedFile;
@@ -26,8 +28,8 @@ public class PredictController {
     }
 
     @PostMapping("/multiPic")
-    public String predictMultiPic(@RequestParam("file")MultipartFile multipartFile,@RequestParam("userId")Integer userId){
-        return predictService.saveMultiPic(multipartFile,userId);
+    public String predictMultiPic(@RequestParam("file")MultipartFile multipartFile,@RequestParam("userId")Integer userId,@RequestParam("message")String message){
+        return predictService.saveMultiPic(multipartFile,userId,message);
     }
 
     @PostMapping("/doTask")
@@ -38,5 +40,17 @@ public class PredictController {
     @GetMapping("/selectAll")
     public List<PredictedFile> selectAllFromPredictedFile(){
         return predictedFileMapper.selectList(null);
+    }
+
+    @GetMapping("/selectOne/{predictedFileId}")
+    public String selectOne(@PathVariable("predictedFileId")Integer predictedFileId){
+        System.out.println(predictedFileId);
+        QueryWrapper<PredictedFile> queryWrapper=new QueryWrapper<>();
+        queryWrapper.eq("id",predictedFileId);
+        PredictedFile predictedFile = predictedFileMapper.selectOne(queryWrapper);
+        System.out.println(predictedFile);
+        if (predictedFile != null){
+            return predictedFile.getBase64Result();
+        }return null;
     }
 }

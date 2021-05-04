@@ -7,6 +7,6 @@ import java.io.File;
 
 public interface PredictService {
     JSONObject predictPic(MultipartFile multipartFile, Integer userId);
-    String saveMultiPic(MultipartFile multipartFile, Integer userId);
+    String saveMultiPic(MultipartFile multipartFile, Integer userId,String message);
     JSONObject predictTaskPic();
 }

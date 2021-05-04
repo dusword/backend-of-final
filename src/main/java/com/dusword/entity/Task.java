@@ -14,9 +14,10 @@ public class Task {
     private Integer UserId;
     private String CreatedTime;
     private String FileName;
-    private Integer IsPredicted;
+    private String IsPredicted;
     private Integer PredictedFileId;
     private String FilePath;
+    private String Message;
 
     public Integer getId() {
         return Id;
@@ -50,11 +51,11 @@ public class Task {
         FileName = fileName;
     }
 
-    public Integer getIsPredicted() {
+    public String getIsPredicted() {
         return IsPredicted;
     }
 
-    public void setIsPredicted(Integer isPredicted) {
+    public void setIsPredicted(String isPredicted) {
         IsPredicted = isPredicted;
     }
 
@@ -72,5 +73,13 @@ public class Task {
 
     public void setFilePath(String filePath) {
         FilePath = filePath;
+    }
+
+    public String getMessage() {
+        return Message;
+    }
+
+    public void setMessage(String message) {
+        Message = message;
     }
 }
