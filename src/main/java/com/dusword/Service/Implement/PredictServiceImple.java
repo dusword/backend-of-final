@@ -3,12 +3,14 @@ package com.dusword.Service.Implement;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.dusword.Mapper.PredictedFileMapper;
-import com.dusword.Mapper.TaskMapper;
+import com.dusword.mapper.PredictedFileMapper;
+import com.dusword.mapper.TaskMapper;
 import com.dusword.Service.PredictService;
 import com.dusword.entity.PredictedFile;
 import com.dusword.entity.Task;
 import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +30,8 @@ public class PredictServiceImple implements PredictService {
 
     @Autowired
     private TaskMapper taskMapper;
+
+    protected static final Logger logger = LoggerFactory.getLogger(PredictServiceImple.class);
 
     @Override
     public JSONObject predictPic(MultipartFile multipartFile, Integer userId) {
@@ -72,12 +76,12 @@ public class PredictServiceImple implements PredictService {
 
     @Override
     public JSONObject predictTaskPic() {
-        System.out.println("Start task predict");
+        logger.info("Start task Service");
         QueryWrapper<Task> wrapper = new QueryWrapper<>();
         wrapper.eq("is_predicted", "未完成").orderByAsc("id").last("limit 1");
         Task task = taskMapper.selectOne(wrapper);
         if (task != null) {
-            System.out.println("Task id is:" + task.getId());
+            logger.info("Task id is:" );
             File file = new File(task.getFilePath());
             JSONObject jsonObject = httpRequest(file, task.getUserId());
             if (jsonObject != null) {
@@ -86,6 +90,7 @@ public class PredictServiceImple implements PredictService {
                 task.setPredictedFileId(predictedFileId);
                 taskMapper.updateById(task);
                 deleteDir(file);
+                logger.info("Task "+ task.getId()+" finished!");
                 return jsonObject;
             }return null;
         } return null;

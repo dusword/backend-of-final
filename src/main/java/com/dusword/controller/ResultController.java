@@ -1,7 +1,7 @@
 package com.dusword.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.dusword.Mapper.ResultMapper;
+import com.dusword.mapper.ResultMapper;
 import com.dusword.Service.JsonService;
 import com.dusword.entity.Result;
 import com.dusword.repository.ResultRepository;

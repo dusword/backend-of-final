@@ -1,4 +1,4 @@
-package com.dusword.Mapper;
+package com.dusword.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.dusword.entity.PredictedFile;

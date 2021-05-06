@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 
 @SpringBootApplication
-@MapperScan("com.dusword.Mapper")
+@MapperScan("com.dusword.mapper")
 public class Backend20210210aApplication {
 
     public static void main(String[] args) {
