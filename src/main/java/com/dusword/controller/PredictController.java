@@ -9,12 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 @RestController
 @RequestMapping("/predict")
 public class PredictController {
-    @Autowired
+    @Resource
     PredictService predictService;
 
     @Autowired
@@ -30,16 +31,6 @@ public class PredictController {
         return predictService.saveMultiPic(multipartFile,userId,message);
     }
 
-    @PostMapping("/doTask")
-    public JSONObject doTask(){
-        return predictService.predictTaskPic();
-    }
-
-    @GetMapping("/selectAll")
-    public List<PredictedFile> selectAllFromPredictedFile(){
-        return predictedFileMapper.selectList(null);
-    }
-
     @GetMapping("/selectOne/{predictedFileId}")
     public String selectOne(@PathVariable("predictedFileId")Integer predictedFileId){
         System.out.println(predictedFileId);
@@ -50,5 +41,17 @@ public class PredictController {
         if (predictedFile != null){
             return predictedFile.getBase64Result();
         }return null;
+    }
+
+
+    @PostMapping("/doTask")
+    public JSONObject doTask(){
+        return predictService.predictTaskPic();
+    }
+
+
+    @GetMapping("/selectAll")
+    public List<PredictedFile> selectAllFromPredictedFile(){
+        return predictedFileMapper.selectList(null);
     }
 }

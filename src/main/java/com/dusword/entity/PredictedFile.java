@@ -13,6 +13,17 @@ public class PredictedFile {
     @TableId(type = IdType.AUTO)
     private Integer id;
 
+    private Integer userId;
+
+    private String recordTime;
+
+    private String divisionResult;
+
+    private String base64Result;
+
+    private String fileName;
+
+
     public Integer getId() {
         return id;
     }
@@ -61,14 +72,5 @@ public class PredictedFile {
         this.fileName = fileName;
     }
 
-    private Integer userId;
-
-    private String recordTime;
-
-    private String divisionResult;
-
-    private String base64Result;
-
-    private String fileName;
 
 }

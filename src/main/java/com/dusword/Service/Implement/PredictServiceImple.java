@@ -144,6 +144,12 @@ public class PredictServiceImple implements PredictService {
         return localFile;
     }
 
+    /**
+     * 请求接口方法
+     * @param localFile
+     * @param userId
+     * @return
+     */
     public JSONObject httpRequest(File localFile, Integer userId) {
         OkHttpClient client = new OkHttpClient().newBuilder().connectTimeout(60000, TimeUnit.MILLISECONDS).readTimeout(60000, TimeUnit.MILLISECONDS)
                 .build();

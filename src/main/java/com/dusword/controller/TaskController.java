@@ -35,7 +35,6 @@ public class TaskController {
 
     @PostMapping("/deleteTask/{predictedFileId}")
     public Integer deleteTask(@PathVariable("predictedFileId") Integer predictedFileId) {
-//        System.out.println(predictedFileId);
         QueryWrapper<Task> queryWrapper1 = new QueryWrapper<>();
         queryWrapper1.eq("predicted_file_id", predictedFileId);
         QueryWrapper<PredictedFile> queryWrapper2 = new QueryWrapper<>();

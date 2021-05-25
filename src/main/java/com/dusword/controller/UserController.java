@@ -21,18 +21,9 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private UserMapper userMapper;
     @Resource
     UserService userService;
-
-
-
-    @PostMapping("/saveUser")
-    public Test_user saveUser(@RequestBody Test_user user) {
-        return userRepository.save(user);
-    }
 
     @PostMapping("/insertUser")
     public Integer insertUser(@RequestBody User user){
