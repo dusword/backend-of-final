@@ -26,9 +26,16 @@ public class TaskController {
     protected static final Logger logger = LoggerFactory.getLogger(TaskController.class);
 
     @GetMapping("/findTaskList/{page}/{size}/{userId}")
-    public Page<Task> findUserList(@PathVariable("page") Integer page, @PathVariable("size") Integer size, @PathVariable("userId") Integer userId) {
+    public Page<Task> findTaskList(@PathVariable("page") Integer page, @PathVariable("size") Integer size, @PathVariable("userId") Integer userId) {
         QueryWrapper<Task> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId).orderByDesc("id");
+        Page<Task> requestPage = new Page<>(page, size);
+        return taskService.page(requestPage, queryWrapper);
+    }
+    @GetMapping("/findTaskList/{page}/{size}/{userId}/{message}")
+    public Page<Task> findTaskList(@PathVariable("page") Integer page, @PathVariable("size") Integer size, @PathVariable("userId") Integer userId,@PathVariable("message") String message) {
+        QueryWrapper<Task> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId).orderByDesc("id").like("message",message);
         Page<Task> requestPage = new Page<>(page, size);
         return taskService.page(requestPage, queryWrapper);
     }

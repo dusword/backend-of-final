@@ -81,7 +81,7 @@ public class PredictServiceImple implements PredictService {
         wrapper.eq("is_predicted", "未完成").orderByAsc("id").last("limit 1");
         Task task = taskMapper.selectOne(wrapper);
         if (task != null) {
-            logger.info("Task id is:" );
+            logger.info("Task id is:"+task.getId());
             File file = new File(task.getFilePath());
             JSONObject jsonObject = httpRequest(file, task.getUserId());
             if (jsonObject != null) {
