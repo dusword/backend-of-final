@@ -15,6 +15,15 @@ public class User {
     private Integer userId;
     private String userName;
     private String userPassword;
+    private Integer authority;
+
+    public Integer getAuthority() {
+        return authority;
+    }
+
+    public void setAuthority(Integer authority) {
+        this.authority = authority;
+    }
 
     public Integer getUserId() {
         return userId;

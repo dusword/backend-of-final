@@ -25,19 +25,36 @@ public class TaskController {
 
     protected static final Logger logger = LoggerFactory.getLogger(TaskController.class);
 
-    @GetMapping("/findTaskList/{page}/{size}/{userId}")
-    public Page<Task> findTaskList(@PathVariable("page") Integer page, @PathVariable("size") Integer size, @PathVariable("userId") Integer userId) {
-        QueryWrapper<Task> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", userId).orderByDesc("id");
-        Page<Task> requestPage = new Page<>(page, size);
-        return taskService.page(requestPage, queryWrapper);
+    @GetMapping("/findTaskList/{page}/{size}/{userId}/{authority}")
+    public Page<Task> findTaskList(@PathVariable("page") Integer page, @PathVariable("size") Integer size, @PathVariable("userId") Integer userId, @PathVariable("authority") Integer authority) {
+        if (authority == 1) {
+            QueryWrapper<Task> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("user_id", userId).orderByDesc("id");
+            Page<Task> requestPage = new Page<>(page, size);
+            return taskService.page(requestPage, queryWrapper);
+        } else if (authority == 0) {
+            QueryWrapper<Task> queryWrapper = new QueryWrapper<>();
+            queryWrapper.orderByDesc("id");
+            Page<Task> requestPage = new Page<>(page, size);
+            return taskService.page(requestPage, queryWrapper);
+        } else
+            return null;
     }
-    @GetMapping("/findTaskList/{page}/{size}/{userId}/{message}")
-    public Page<Task> findTaskList(@PathVariable("page") Integer page, @PathVariable("size") Integer size, @PathVariable("userId") Integer userId,@PathVariable("message") String message) {
-        QueryWrapper<Task> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", userId).orderByDesc("id").like("message",message);
-        Page<Task> requestPage = new Page<>(page, size);
-        return taskService.page(requestPage, queryWrapper);
+
+    @GetMapping("/findTaskList/{page}/{size}/{userId}/{message}/{authority}")
+    public Page<Task> findTaskList(@PathVariable("page") Integer page, @PathVariable("size") Integer size, @PathVariable("userId") Integer userId, @PathVariable("message") String message, @PathVariable("authority") Integer authority) {
+        if (authority == 1) {
+            QueryWrapper<Task> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("user_id", userId).orderByDesc("id").like("message", message);
+            Page<Task> requestPage = new Page<>(page, size);
+            return taskService.page(requestPage, queryWrapper);
+        } else if (authority == 0) {
+            QueryWrapper<Task> queryWrapper = new QueryWrapper<>();
+            queryWrapper.orderByDesc("id").like("message", message);
+            Page<Task> requestPage = new Page<>(page, size);
+            return taskService.page(requestPage, queryWrapper);
+        } else
+            return null;
     }
 
     @PostMapping("/deleteTask/{predictedFileId}")
@@ -49,9 +66,9 @@ public class TaskController {
         int result1 = taskMapper.delete(queryWrapper1);
         int result2 = predictedFileMapper.delete(queryWrapper2);
         if (result1 == 1) {
-            logger.info("Task中predictedFileId为"+predictedFileId+"的记录删除成功");
+            logger.info("Task中predictedFileId为" + predictedFileId + "的记录删除成功");
             if (result2 == 1) {
-                logger.info("PredictedFile中的Id为"+predictedFileId+"的记录删除成功");
+                logger.info("PredictedFile中的Id为" + predictedFileId + "的记录删除成功");
                 return 1;
             } else
                 logger.info("Task记录删除成功");

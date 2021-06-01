@@ -39,19 +39,17 @@ public class UserController {
     }
 
     @PostMapping("/checkUser")
-    public Integer checkUser(@RequestBody User user) {
+    public User checkUser(@RequestBody User user) {
         QueryWrapper<User> wrapper=new QueryWrapper<>();
         wrapper.eq("user_name",user.getUserName()).eq("user_password",user.getUserPassword());
         try {
             user=userMapper.selectOne(wrapper);
-            if (user == null){
-                return 0;
-            }
-            return user.getUserId();
+//            return user.getUserId();
+            return user;
         }catch (Exception e){
             e.printStackTrace();
         }
-        return 0;
+        return null;
     }
 
     @GetMapping("/findUserList/{page}/{size}")
